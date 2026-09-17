@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PursePulse - Personal Finance Dashboard</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+
+  <!-- =========================================================================
+       MAIN APPLICATION CONTAINER (Opens Directly)
+       ========================================================================= -->
+  <div id="app" class="app-container">
+
+    <!-- SIDEBAR NAVIGATION -->
+    <aside class="sidebar" aria-label="Sidebar Navigation">
+      <div class="sidebar-header">
+        <a href="#dashboard" class="brand-link" aria-label="PursePulse Home">
+          <div class="brand-logo-container">
+            <img src="assests/logo.png" alt="" aria-hidden="true" class="brand-logo-img" width="36" height="36" >
+          </div>
+          <span class="brand-name">PursePulse</span>
+        </a>
+      </div>
+
+      <nav class="sidebar-nav">
+        <ul>
+          <li>
+            <a href="#dashboard" id="nav-dashboard" class="nav-link active" data-section="dashboard">
+              <i data-lucide="layout-dashboard" class="nav-icon" aria-hidden="true"></i>
+              <span class="nav-label">Dashboard</span>
+            </a>
+          </li>
+          <li>
+            <a href="#transactions" id="nav-transactions" class="nav-link" data-section="transactions">
+              <i data-lucide="arrow-left-right" class="nav-icon" aria-hidden="true"></i>
+              <span class="nav-label">Transactions</span>
+            </a>
+          </li>
+          <li>
+            <a href="#analytics" id="nav-analytics" class="nav-link" data-section="analytics">
+              <i data-lucide="chart-pie" class="nav-icon" aria-hidden="true"></i>
+              <span class="nav-label">Analytics</span>
+            </a>
+          </li>
+          <li>
+            <a href="#accounts" id="nav-accounts" class="nav-link" data-section="accounts">
+              <i data-lucide="wallet-cards" class="nav-icon" aria-hidden="true"></i>
+              <span class="nav-label">Accounts</span>
+            </a>
+          </li>
+          <li>
+            <a href="#bills" id="nav-bills" class="nav-link" data-section="bills">
+              <i data-lucide="receipt" class="nav-icon" aria-hidden="true"></i>
+              <span class="nav-label">Bills & Subscriptions</span>
+            </a>
+          </li>
+          <li>
+            <a href="#settings" id="nav-settings" class="nav-link" data-section="settings">
+              <i data-lucide="settings" class="nav-icon" aria-hidden="true"></i>
+              <span class="nav-label">Settings</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </aside>
+
+    <!-- MAIN CONTENT AREA -->
+    <main class="main-content">
+
+      <!-- TOP HEADER BAR -->
+      <header class="dashboard-header">
+        <div class="header-left">
+          <h2 class="page-title" id="current-page-title">Dashboard</h2>
+          <p class="greeting-text">Welcome back, Kripa!</p>
+        </div>
+
+        <div class="header-right">
+          <!-- Add Transaction Modal Trigger -->
+          <button type="button" class="btn btn-primary" id="open-transaction-modal-btn" aria-haspopup="dialog" aria-controls="add-transaction-modal">
+            <span class="btn-icon" aria-hidden="true">+</span>
+            <span class="btn-text">Add Transaction</span>
+          </button>
+
+          <!-- User Profile Indicator -->
+          <div class="user-profile" role="region" aria-label="User Profile Info">
+            <a href="#settings" class="profile-card-link" aria-label="View user profile for Kripa Mehta">
+              <div class="avatar-wrapper">
+                <img src="assests/professional.jpeg" alt="Profile picture of Kripa Mehta" class="user-avatar" width="44" height="44">
+                <span class="status-indicator online" aria-label="User online status: Active"></span>
+              </div>
+              <div class="user-details">
+                <span class="user-name">Kripa Mehta</span>
+                <span class="user-role">Premium Member</span>
+              </div>
+            </a>
+          </div>
+        </div>
+      </header>
+
+      <!-- FINANCIAL SUMMARY CARDS -->
+      <section class="overview-cards" aria-label="Financial Summary Overview">
+        <article class="card balance-card">
+          <header class="card-header">
+            <h3>Total Balance</h3>
+            <i data-lucide="wallet" class="card-icon" aria-hidden="true"></i>
+          </header>
+          <p class="amount" id="total-balance-display">₹0</p>
+          <footer class="card-footer">
+            <span class="badge positive">+2.4% from last month</span>
+          </footer>
+        </article>
+
+        <article class="card income-card">
+          <header class="card-header">
+            <h3>Total Income</h3>
+            <i data-lucide="trending-up" class="card-icon" aria-hidden="true"></i>
+          </header>
+          <p class="amount" id="total-income-display">₹0</p>
+          <footer class="card-footer">
+            <span class="badge positive">+10% target reached</span>
+          </footer>
+        </article>
+
+        <article class="card expenses-card">
+          <header class="card-header">
+            <h3>Total Expenses</h3>
+            <i data-lucide="trending-down" class="card-icon" aria-hidden="true"></i>
+          </header>
+          <p class="amount" id="total-expenses-display">₹0</p>
+          <footer class="card-footer">
+            <span class="badge negative">-5% vs last month</span>
+          </footer>
+        </article>
+
+        <article class="card budget-card">
+          <header class="card-header">
+            <h3>Monthly Budget</h3>
+            <i data-lucide="target" class="card-icon" aria-hidden="true"></i>
+          </header>
+          <p class="amount">₹40,000</p>
+          <footer class="card-footer">
+            <progress id="app-progress" value="0" max="40000" aria-label="Budget usage progress"></progress>
+            <span id="budget-usage-text">0% used</span>
+          </footer>
+        </article>
+      </section>
+
+      <!-- ===================================================================
+           SECTION 1: DASHBOARD VIEW
+           =================================================================== -->
+      <section id="section-dashboard" class="app-section">
+        <div class="dashboard-grid">
+          
+          <!-- Spending Chart Area -->
+          <div class="grid-primary-column">
+            <article class="card chart-card">
+              <header class="card-header">
+                <h3>Spending by Category</h3>
+                <div class="time-filter">
+                  <button type="button" class="btn-time active" data-period="This Month">This Month</button>
+                  <button type="button" class="btn-time" data-period="Last Month">Last Month</button>
+                </div>
+              </header>
+              <div class="chart-container" id="dashboard-bar-chart" role="region" aria-label="Spending Chart Visual Component">
+                <!-- Injected via JavaScript -->
+              </div>
+            </article>
+          </div>
+
+          <!-- Financial Goals Area -->
+          <div class="grid-secondary-column">
+            <article class="card goals-card">
+              <header class="card-header">
+                <h3>Financial Goals</h3>
+                <button type="button" class="action-link-btn" id="open-goal-modal-btn">+ New Goal</button>
+              </header>
+              <ul class="goals-list" id="goals-container-list">
+                <!-- Dynamically populated goals -->
+              </ul>
+            </article>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ===================================================================
+           SECTION 2: TRANSACTIONS VIEW
+           =================================================================== -->
+      <section id="section-transactions" class="app-section" style="display: none;">
+        <article class="transactions-section">
+          <header class="section-header">
+            <h3>All Transactions</h3>
+            
+            <div class="filter-group" role="group" aria-label="Filter transactions by type">
+              <button type="button" class="btn-filter active" data-filter="All">All</button>
+              <button type="button" class="btn-filter" data-filter="Income">Income</button>
+              <button type="button" class="btn-filter" data-filter="Expense">Expense</button>
+            </div>
+          </header>
+
+          <div class="table-wrapper">
+            <table class="transaction-table">
+              <caption>List of financial transactions and details</caption>
+              <thead>
+                <tr>
+                  <th scope="col">Category</th>
+                  <th scope="col">Description</th>
+                  <th scope="col">Date</th>
+                  <th scope="col">Amount</th>
+                </tr>
+              </thead>
+              <tbody id="transactions-table-body">
+                <!-- Dynamically populated transaction rows -->
+              </tbody>
+            </table>
+          </div>
+        </article>
+      </section>
+
+      <!-- ===================================================================
+           SECTION 3: ANALYTICS VIEW
+           =================================================================== -->
+      <section id="section-analytics" class="app-section" style="display: none;">
+        <article class="card chart-card analytics-full-card">
+          <header class="card-header">
+            <div>
+              <h3>Detailed Analytics & Breakdown</h3>
+              <p class="greeting-text" id="analytics-total-summary">Total Spending Breakdown</p>
+            </div>
+            <div class="time-filter">
+              <button type="button" class="btn-time active" data-period="This Month">This Month</button>
+              <button type="button" class="btn-time" data-period="Last Month">Last Month</button>
+            </div>
+          </header>
+          <div class="chart-container analytics-chart-height" id="analytics-bar-chart">
+            <!-- Detailed bar chart dynamically generated -->
+          </div>
+        </article>
+      </section>
+
+      <!-- ===================================================================
+           SECTION 4: ACCOUNTS VIEW
+           =================================================================== -->
+      <section id="section-accounts" class="app-section" style="display: none;">
+        <div class="dashboard-grid">
+          
+          <div class="grid-primary-column">
+            <article class="card accounts-card">
+              <header class="card-header">
+                <h3>Connected Accounts</h3>
+                <button type="button" class="action-link-btn" id="open-account-modal-btn">+ Link Account</button>
+              </header>
+              <ul class="accounts-list" id="accounts-container-list">
+                <!-- Dynamically populated accounts -->
+              </ul>
+            </article>
+          </div>
+
+          <div class="grid-secondary-column">
+            <article class="card transfer-card">
+              <header class="card-header">
+                <h3>Quick Transfer</h3>
+              </header>
+              <form action="#" method="post" id="quick-transfer-form" class="quick-transfer-form">
+                <div class="form-group">
+                  <label for="transfer-recipient">Send To</label>
+                  <input type="text" id="transfer-recipient" name="recipient" placeholder="Name or UPI ID" required>
+                </div>
+                <div class="form-group">
+                  <label for="transfer-amount">Amount (₹)</label>
+                  <input type="number" id="transfer-amount" name="transfer_amount" placeholder="0.00" min="1" step="0.01" required>
+                </div>
+                <button type="submit" class="btn btn-secondary">Send Money</button>
+              </form>
+            </article>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ===================================================================
+           SECTION 5: BILLS & SUBSCRIPTIONS VIEW
+           =================================================================== -->
+      <section id="section-bills" class="app-section" style="display: none;">
+        <article class="card bills-card">
+          <header class="card-header">
+            <h3>Upcoming Bills & Subscriptions</h3>
+            <button type="button" class="action-link-btn" id="open-bill-modal-btn">+ Add Bill</button>
+          </header>
+          <ul class="bills-list" id="bills-container-list">
+            <!-- Dynamically populated bills -->
+          </ul>
+        </article>
+      </section>
+
+      <!-- ===================================================================
+           SECTION 6: SETTINGS VIEW
+           =================================================================== -->
+      <section id="section-settings" class="app-section" style="display: none;">
+        <div class="dashboard-grid">
+          
+          <div class="grid-primary-column">
+            <!-- Appearance Settings -->
+            <article class="card settings-card">
+              <header class="card-header">
+                <h3>Appearance Theme</h3>
+              </header>
+              <div class="theme-switch-container">
+                <p class="greeting-text">Choose your preferred application color palette:</p>
+                <div class="theme-options">
+                  <button type="button" class="btn btn-secondary" id="theme-dark-btn">Dark Mode (Default)</button>
+                  <button type="button" class="btn btn-secondary" id="theme-light-btn">Light Mode</button>
+                </div>
+              </div>
+            </article>
+
+            <!-- User Account Settings -->
+            <article class="card settings-card">
+              <header class="card-header">
+                <h3>User Account Details</h3>
+              </header>
+              <div class="account-details-view">
+                <p><strong>Full Name:</strong> Kripa Mehta</p>
+                <p><strong>Username:</strong> kripa.mehta</p>
+                <p><strong>Account Type:</strong> Premium Account</p>
+              </div>
+            </article>
+          </div>
+
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- =========================================================================
+       MODAL DIALOG: ADD TRANSACTION
+       ========================================================================= -->
+  <dialog id="add-transaction-modal" aria-labelledby="modal-title">
+    <div class="modal-content">
+      <header class="modal-header">
+        <h3 id="modal-title">Add New Transaction</h3>
+        <button type="button" class="btn-close" id="close-transaction-modal-btn" aria-label="Close modal">×</button>
+      </header>
+
+      <form action="#" method="post" id="transaction-form" class="transaction-form">
+        <div class="form-group">
+          <label for="transaction-type">Type</label>
+          <select id="transaction-type" name="type" required>
+            <option value="expense">Expense</option>
+            <option value="income">Income</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="transaction-amount">Amount (₹)</label>
+          <input type="number" id="transaction-amount" name="amount" step="0.01" min="0.01" placeholder="e.g. 500" required>
+        </div>
+
+        <div class="form-group">
+          <label for="transaction-category">Category</label>
+          <select id="transaction-category" name="category" required>
+            <option value="" disabled selected>Select a category</option>
+            <optgroup label="Expenses">
+              <option value="food">Food & Dining</option>
+              <option value="transport">Transportation</option>
+              <option value="shopping">Shopping</option>
+              <option value="utilities">Utilities & Bills</option>
+              <option value="entertainment">Entertainment</option>
+              <option value="healthcare">Healthcare & Medical</option>
+              <option value="housing">Housing & Rent</option>
+              <option value="subscriptions">Subscriptions & Services</option>
+              <option value="education">Education</option>
+            </optgroup>
+            <optgroup label="Income">
+              <option value="salary">Salary & Wage</option>
+              <option value="freelance">Freelance & Side Gig</option>
+              <option value="investments">Investments & Dividends</option>
+              <option value="other-income">Other Income</option>
+            </optgroup>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="transaction-date">Date</label>
+          <input type="date" id="transaction-date" name="date" required>
+        </div>
+
+        <div class="form-group">
+          <label for="transaction-description">Description</label>
+          <input type="text" id="transaction-description" name="description" placeholder="e.g. Lunch with team">
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn btn-cancel" id="cancel-transaction-modal-btn">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Transaction</button>
+        </div>
+      </form>
+    </div>
+  </dialog>
+
+  <!-- =========================================================================
+       MODAL DIALOG: ADD NEW GOAL
+       ========================================================================= -->
+  <dialog id="add-goal-modal" aria-labelledby="goal-modal-title">
+    <div class="modal-content">
+      <header class="modal-header">
+        <h3 id="goal-modal-title">Create New Financial Goal</h3>
+        <button type="button" class="btn-close" id="close-goal-modal-btn" aria-label="Close modal">×</button>
+      </header>
+      <form id="goal-form" class="transaction-form">
+        <div class="form-group">
+          <label for="goal-title-input">Goal Name</label>
+          <input type="text" id="goal-title-input" required placeholder="e.g. Car Fund">
+        </div>
+        <div class="form-group">
+          <label for="goal-target-input">Target Amount (₹)</label>
+          <input type="number" id="goal-target-input" min="1" step="0.01" required placeholder="50000">
+        </div>
+        <div class="form-group">
+          <label for="goal-current-input">Current Amount (₹)</label>
+          <input type="number" id="goal-current-input" min="0" step="0.01" required placeholder="10000">
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-cancel" id="cancel-goal-modal-btn">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Goal</button>
+        </div>
+      </form>
+    </div>
+  </dialog>
+
+  <!-- Application Script -->
+  <script src="js/script.js"></script>
+</body>
+</html>
